@@ -1,4 +1,6 @@
 // Consolidated Titanic's End Palettes for Pixelblaze
+// Test pattern - lets the user select a palette with
+// the webUI slider.
 // v1.0
 
 var TE_Cyan_Blue_Purple = [
