@@ -7,5 +7,5 @@ lighting with a Titanic's End-themed look, using color palettes direct from the 
 - If you prefer to work with the JavaScript source, it's in the js folder
 - If you'd like to write your own patterns using TE colors, the swatches, color
 palettes and individual color data are available (in Pixelblaze-compatible format) in
-in the resources directory.
+in the resources folder.
 

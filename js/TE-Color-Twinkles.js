@@ -1,13 +1,13 @@
-// Animated Palette cross fade in TE colors
-// 8/2023 ZRanger1
+// Titanic's End-colored variation on the stock "color twinkles"
+// pattern
 
 var TE_Cyan_Blue_Purple = [
-  0.0, 0.1326, 0.0038, 0.16,  
-  0.1666, 0.1059, .0055, 0.4818, 
-  0.3333, 0.061, 0.0246, 0.5610, 
-  0.5, 0.4086, 0.25196, 0.9006,   
-  0.6667, 0.1964, 0.6029, 1.0,        
-  1.0, 0.1246, 0.6275, 0.8277,      
+  0.0, 0.1326, 0.0038, 0.16,        // plumice dark purple
+  0.1666, 0.1059, .0055, 0.4818,    // sunset purple  
+  0.3333, 0.061, 0.0246, 0.5610,    // synwavedyn purpler
+  0.5, 0.4086, 0.25196, 0.9006,     // IceGrad desat light purple  
+  0.6667, 0.1964, 0.6029, 1.0,      // sunwave cyan  
+  1.0, 0.1246, 0.6275, 0.8277,      // iecOlate cyan
   ]
 
 var TE_Pink_Purple = [
@@ -42,16 +42,9 @@ var TE_Cyan_Ice = [
 var pal = TE_Cyan_Blue_Purple;
 
 var palettes = [TE_Cyan_Blue_Purple,TE_Pink_Purple,TE_Cyan_Green,TE_Orange_Green,TE_Cyan_Ice]
-export var repeats = 4;
-var speed = 1.25;
-var freeze = 0;
-
-var pal = TE_Cyan_Blue_Purple;
-
-var palettes = [TE_Cyan_Blue_Purple,TE_Pink_Purple,TE_Cyan_Green,TE_Orange_Green,TE_Cyan_Ice]
 // control variables for palette switch timing (these are in seconds)
-export var PALETTE_HOLD_TIME = 1
-export var PALETTE_TRANSITION_TIME = 1;
+export var PALETTE_HOLD_TIME = 2
+export var PALETTE_TRANSITION_TIME = 2;
 var PALETTE_HOLD = 0;
 
 // internal variables used by the palette manager.
@@ -71,6 +64,8 @@ var currentPalette = array(4 * PALETTE_SIZE)
 var inTransition = 0;
 var blendValue = 0;
 runTime = 0
+speed = 0.333;
+export var density = 0.1;
 
 // Startup initialization for palette manager
 setPalette(currentPalette);
@@ -78,11 +73,11 @@ buildBlendedPalette(palettes[currentIndex],palettes[nextIndex],blendValue)
 
 // UI Controls
 export function sliderSpeed(v) {
-  speed = clamp(-2 + 4 * v,-2,2);
+  speed = v;
 }
 
-export function sliderRepeats(v) {
-  repeats = clamp(v * 8,1,8);
+export function sliderDensity(v) {
+  density = 1-max(v,0.002);
 }
 
 // how long we stick with a palette before transitioning to
@@ -96,14 +91,8 @@ export function sliderTransitionTime(v) {
   PALETTE_TRANSITION_TIME = 10 * v * v;
 }
 
-// stay  with the current palette
 export function togglePaletteHold(v) {
   PALETTE_HOLD = v;
-}
-
-// stop animation
-export function toggleFreeze(v) {
-  freeze = v; 
 }
 
 // user space version of Pixelblaze's paint function. Stores
@@ -206,12 +195,13 @@ export function beforeRender(delta) {
   }
   
   // pattern-specific code below this line
-  timebase = (timebase + ((delta * speed) / 1000)) % 3600;  
-  t1 = (freeze) ? 0: timebase;
+  timebase = (timebase + (delta * speed / 1000)) % 3600;  
+  t1 = timebase / 3.333;
 }
 
 export function render(index) {
-  var k = frac(t1 + triangle(repeats * index/pixelCount));
-  k = k * k;
-  paint(k,k);
+  h = sin(index / 3 + PI2 * sin(index / 2 + t1))
+  v = wave(index / 3 / PI2 + sin(index / 2 + timebase))
+  v = v > density ? v * v * v * v : 0
+  paint(h,v)
 }
